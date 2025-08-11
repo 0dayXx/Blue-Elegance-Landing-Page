@@ -1554,6 +1554,186 @@
         .cancel-btn:hover {
             background: var(--text);
         }
+        
+        /* NEW SEARCH FUNCTIONALITY STYLES */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-icon {
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .search-icon:hover {
+            color: var(--blue);
+        }
+        
+        .search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 100px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .search-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .search-box {
+            width: 80%;
+            max-width: 700px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 20px 60px 20px 25px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.2rem;
+            background: var(--secondary);
+            color: var(--text);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            transition: var(--transition);
+        }
+        
+        .dark-theme .search-input {
+            background: var(--dark-secondary);
+            color: var(--dark-text);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--blue);
+        }
+        
+        .search-close {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .search-close:hover {
+            color: var(--blue);
+        }
+        
+        .search-results {
+            width: 80%;
+            max-width: 700px;
+            max-height: 60vh;
+            overflow-y: auto;
+            margin-top: 30px;
+            background: var(--secondary);
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+        
+        .dark-theme .search-results {
+            background: var(--dark-secondary);
+        }
+        
+        .search-result-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 1.3rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-light);
+        }
+        
+        .search-result-item {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .search-result-item:hover {
+            background: rgba(93, 156, 236, 0.1);
+        }
+        
+        .search-result-image {
+            width: 80px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .search-result-details {
+            flex: 1;
+        }
+        
+        .search-result-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .search-result-category {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .search-result-price {
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        @media (max-width: 768px) {
+            .search-overlay {
+                padding-top: 70px;
+            }
+            
+            .search-box, .search-results {
+                width: 90%;
+            }
+            
+            .search-input {
+                padding: 15px 50px 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .search-result-item {
+                gap: 15px;
+                padding: 12px;
+            }
+            
+            .search-result-image {
+                width: 70px;
+                height: 90px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1583,7 +1763,12 @@
             <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
                 <i class="fas fa-moon"></i>
             </button>
-            <a href="#"><i class="fas fa-search"></i></a>
+            
+            <!-- Updated Search Icon -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon" id="searchIcon"></i>
+            </div>
+            
             <a href="#" class="cart-icon" id="cartIcon">
                 <i class="fas fa-shopping-bag"></i>
                 <span class="cart-count" id="cartCount">0</span>
@@ -1593,6 +1778,24 @@
             <i class="fas fa-bars"></i>
         </div>
     </header>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search for dresses, tops, skirts...">
+            <button class="search-close" id="searchClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="search-results" id="searchResults">
+            <h3 class="search-result-title">Search Results</h3>
+            <div class="no-results" id="noResults">
+                <p>Enter a search term to find products</p>
+            </div>
+            <!-- Search results will appear here dynamically -->
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -1683,7 +1886,7 @@
         
         <div class="about-container">
             <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Blue Elegance Fashion Design">
+                <img src="https:https://www.lulus.com/images/content/cat_adzone_13_0_itlist2coladzoneclickable1_1754682450.jpg" alt="Blue Elegance Fashion Design">
             </div>
             
             <div class="about-content">
@@ -1976,9 +2179,10 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- JavaScript for Search Functionality -->
     <script>
-        // Product data
+        // Product data (same as before)
         const products = [
             {
                 id: 1,
@@ -2032,6 +2236,148 @@
             }
         ];
 
+        // Search Functionality
+        const searchIcon = document.getElementById('searchIcon');
+        const searchOverlay = document.getElementById('searchOverlay');
+        const searchClose = document.getElementById('searchClose');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const noResults = document.getElementById('noResults');
+        
+        // Open search overlay
+        searchIcon.addEventListener('click', () => {
+            searchOverlay.classList.add('active');
+            searchInput.focus();
+        });
+        
+        // Close search overlay
+        searchClose.addEventListener('click', () => {
+            searchOverlay.classList.remove('active');
+            searchInput.value = '';
+            clearSearchResults();
+        });
+        
+        // Close search when clicking outside
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) {
+                searchOverlay.classList.remove('active');
+                searchInput.value = '';
+                clearSearchResults();
+            }
+        });
+        
+        // Close search with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+                searchOverlay.classList.remove('active');
+                searchInput.value = '';
+                clearSearchResults();
+            }
+        });
+        
+        // Search as user types
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            
+            if (searchTerm.length === 0) {
+                clearSearchResults();
+                return;
+            }
+            
+            // Filter products
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) || 
+                product.category.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm)
+            );
+            
+            displaySearchResults(filteredProducts);
+        });
+        
+        // Display search results
+        function displaySearchResults(results) {
+            clearSearchResults();
+            
+            if (results.length === 0) {
+                noResults.innerHTML = '<p>No products found. Try a different search term.</p>';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            results.forEach(product => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <img src="${product.images[0]}" alt="${product.name}" class="search-result-image">
+                    <div class="search-result-details">
+                        <div class="search-result-name">${product.name}</div>
+                        <div class="search-result-category">${product.category}</div>
+                        <div class="search-result-price">${product.price} DH</div>
+                    </div>
+                `;
+                
+                // Add click event to view product details
+                resultItem.addEventListener('click', () => {
+                    // Open product details overlay
+                    openProductDetails(product.id);
+                    // Close search overlay
+                    searchOverlay.classList.remove('active');
+                    searchInput.value = '';
+                });
+                
+                searchResults.appendChild(resultItem);
+            });
+        }
+        
+        // Clear search results
+        function clearSearchResults() {
+            // Remove all result items
+            while (searchResults.children.length > 1) {
+                searchResults.removeChild(searchResults.lastChild);
+            }
+            
+            // Show placeholder message
+            noResults.innerHTML = '<p>Enter a search term to find products</p>';
+            noResults.style.display = 'block';
+        }
+        
+        // Function to open product details
+        function openProductDetails(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            
+            if (currentProduct) {
+                // Update product info
+                productTitle.textContent = currentProduct.name;
+                productCategory.textContent = currentProduct.category;
+                productPrice.textContent = `${currentProduct.price} DH`;
+                productDescription.textContent = currentProduct.description;
+                
+                // Set main image
+                mainProductImage.src = currentProduct.images[0];
+                
+                // Create thumbnails
+                productThumbnails.innerHTML = '';
+                currentProduct.images.forEach((img, index) => {
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = img;
+                    thumbnail.classList.add('thumbnail');
+                    if (index === 0) thumbnail.classList.add('active');
+                    thumbnail.addEventListener('click', () => {
+                        mainProductImage.src = img;
+                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                        thumbnail.classList.add('active');
+                    });
+                    productThumbnails.appendChild(thumbnail);
+                });
+                
+                // Show overlay
+                productOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
         // Initialize cart
         let cart = [];
         let currentProduct = null;
